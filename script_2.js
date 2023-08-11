@@ -5,7 +5,6 @@ const c_dot = document.getElementById('dot_count');
 const d_rate = document.getElementById('d_rate');
 const a_rate = document.getElementById('a_rate');
 const s_size = document.getElementById('s_size');
-const d_size = document.getElementById('d_size');
 
 const mousePos = {x:0, y:0};
 const rawMouse = {x:0, y:0};
@@ -25,9 +24,7 @@ class Dot {
     static screen = 10;
     static dot_size = 13.5;
     static gravity = 20;
-    //static friction = 0.9;
     static friction = 1;
-    static ground = 500;
 
     constructor(x, y, size) {
 
@@ -131,25 +128,6 @@ class Dot {
         const inertia = 1;
         this.velocity.x = (this.position.x - this.lastPos.x)*inertia;
         this.velocity.y = (this.position.y - this.lastPos.y)*inertia;
-
-        if(this.position.y > Dot.ground){
-            this.velocity.x *= Dot.friction;
-            this.velocity.y = 0;
-        }
-
-        this.velocity.y += Dot.gravity * delta;
-        this.lastPos = {x: this.position.x, y: this.position.y};
-        this.position.y += this.velocity.y;
-        this.position.x += this.velocity.x;
-        this.move(0, 0);
-    }
-
-    att(delta) {
-
-        if(this.position.y > Dot.ground){
-            this.velocity.x *= Dot.friction;
-            this.velocity.y = 0;
-        }
 
         this.velocity.y += Dot.gravity * delta;
         this.lastPos = {x: this.position.x, y: this.position.y};
@@ -434,13 +412,11 @@ const resize_ = (event) => {
     Dot.screen = box.getBoundingClientRect().height;
     Dot.dot_size = Dot.screen * 0.02 * 10/8;
 
-    s_size.innerHTML = `screen size: ${Dot.screen}px`;
-    d_size.innerHTML = `dot size: ${collider.dot_size}px`;
+    s_size.innerHTML = `box size: ${Dot.screen}px`;
 
     dots.forEach(dot => {
         dot.resize(dot.rawSize);
     });
-    Dot.ground = Dot.screen - Dot.dot_size - 4;
 }
 resize_();
 window.addEventListener('resize', resize_);

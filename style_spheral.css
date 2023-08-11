@@ -103,7 +103,9 @@ h3 {
 }
 
 h3:nth-of-type(2) {
-  top: 30px;
+  top: auto;
+  bottom: 10px;
+  width: 400px;
 }
 
 a {

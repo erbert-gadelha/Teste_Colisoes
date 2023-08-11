@@ -5,7 +5,6 @@ const c_dot = document.getElementById('dot_count');
 const d_rate = document.getElementById('d_rate');
 const a_rate = document.getElementById('a_rate');
 const s_size = document.getElementById('s_size');
-const d_size = document.getElementById('d_size');
 
 const mousePos = {x:0, y:0};
 const rawMouse = {x:0, y:0};
@@ -420,8 +419,7 @@ const resize_ = (event) => {
     Dot.screen = box.getBoundingClientRect().height;
     Dot.dot_size = Dot.screen * 0.02 * 10/8;
 
-    s_size.innerHTML = `screen size: ${Dot.screen}px`;
-    d_size.innerHTML = `dot size: ${collider.dot_size}px`;
+    s_size.innerHTML = `box size: ${Dot.screen}px`;
 
     dots.forEach(dot => {
         dot.resize(dot.rawSize);
