@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;400;500;600;700&display=swap');
+
+* {
+  border: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: content-box;
+  font-family: 'Lexend Deca', sans-serif;}
+
+:root {
+  --deep-grey: #363636;
+  --dot: #44f83e;
+  --grey: #444444;
+  --blue: #1B77F3;
+  --size: 100px;
+}
+
+
+body {
+  background-color: var(--grey);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#box {
+  background-color: var(--deep-grey);
+  /*outline: solid 5px var(--blue);*/
+  outline: solid 3px wheat;
+  height: calc(var(--size) * 0.8);
+  width: calc(var(--size) * 0.8);
+  cursor: pointer;
+  position: relative;
+}
+
+
+.dot{
+  position: absolute;
+  height: calc(var(--size) * 0.02);
+  width: calc(var(--size) * 0.02);
+  /*height: calc(var(--size) * 0.2);
+  width: calc(var(--size) * 0.2);*/
+  background-color: var(--dot);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.colliding {
+  background-color: var(--blue);
+}
+
+h2 {
+  top: 0;
+  left: 10px;
+  color: white;
+  position: absolute;
+  font-size: medium;
+}
+
+h2:nth-of-type(2) {
+  top: 30px;
+}
+
+h2:nth-of-type(3) {
+  top: 60px;
+}
+
+h3 {
+  top: 0;
+  right: 10px;
+  width: 200px;
+
+  color: white;
+  position: absolute;
+  font-size: medium;
+}
+
+h3:nth-of-type(2) {
+  top: 30px;
+}
+
+/* Portrait
+ */
+ @media screen and (orientation:portrait) {
+  :root {
+    --size: 100vw;
+  }
+}
+/* Landscape */
+@media screen and (orientation:landscape) {
+  :root {
+    --size: 100vh;
+  }
+}
