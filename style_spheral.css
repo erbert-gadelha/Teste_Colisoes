@@ -27,18 +27,20 @@ body {
 
 #box {
   background-color: var(--deep-grey);
-  /*outline: solid 5px var(--blue);
-  */outline: solid 3px wheat;
+  /*outline: solid 5px var(--blue);*/
+  outline: solid 3px wheat;
   height: calc(var(--size) * 0.8);
   width: calc(var(--size) * 0.8);
-  overflow: hidden;
+
+  /*overflow: hidden;*/
+
   /*height: 550px;
-  width: 550px;
-  */cursor: pointer;
+  width: 550px;*/
+
+  cursor: pointer;
   position: relative;
-  /*border-radius: 50%;
-  */
-  border-radius: 2%;
+
+  border-radius: 50%;
 }
 
 .dot {
@@ -104,19 +106,18 @@ h3:nth-of-type(2) {
   top: 30px;
 }
 
-
 a {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  color: white;
-  padding: 5px;
-  background-color: var(--deep-grey);
-  border-radius: 10px;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  -ms-border-radius: 10px;
-  -o-border-radius: 10px;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: white;
+    padding: 5px;
+    background-color: var(--deep-grey);
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
 }
 
 /* Portrait

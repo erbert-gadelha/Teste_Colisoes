@@ -25,7 +25,8 @@ class Dot {
     static screen = 10;
     static dot_size = 13.5;
     static gravity = 20;
-    static friction = 0.9;
+    //static friction = 0.9;
+    static friction = 1;
     static ground = 500;
 
     constructor(x, y, size) {
@@ -75,15 +76,37 @@ class Dot {
         return newDot;
     }
 
-    move_to(x, y) {
+    justify(x, y) {
+        const center = {
+            x: Dot.screen / 2,
+            y: Dot.screen / 2
+        };
+    
+        const vetor = { x: x - center.x, y: y - center.y };
+        const distance = Math.sqrt(Math.pow(vetor.x, 2) + Math.pow(vetor.y, 2));
+    
+        if (distance <= Dot.screen / 2 - this.rawSize / 2)
+            return { x: x, y: y };
         
-        this.position.x = x;
-        this.position.y = y;
+    
+        if (distance === 0)
+            return { x: x, y: y };
+        
+    
+        const normalized = { x: vetor.x / distance, y: vetor.y / distance };
+        const offset = Dot.screen / 2 - this.rawSize / 2;
+    
+        return {
+            x: center.x + normalized.x * offset,
+            y: center.y + normalized.y * offset
+        };
+    }
 
-        const boundary = Dot.screen - this.rawSize/2;
-
-        this.position.x = clamp(this.position.x, this.rawSize/2, boundary);
-        this.position.y = clamp(this.position.y, this.rawSize/2, boundary);
+    move_to(x, y) {
+                
+        const justify = this.justify(x, y);
+        this.position.x = justify.x;
+        this.position.y = justify.y;
 
         this.lastPos.x = this.position.x;
         this.lastPos.y = this.position.y;
@@ -96,13 +119,9 @@ class Dot {
     }
 
     move(x, y) {
-        this.position.x += x;
-        this.position.y += y;
-
-        const boundary = Dot.screen - this.rawSize/2;
-
-        this.position.x = clamp(this.position.x, this.rawSize/2, boundary);
-        this.position.y = clamp(this.position.y, this.rawSize/2, boundary);
+        const justify = this.justify(this.position.x + x, this.position.y + y);
+        this.position.x = justify.x;
+        this.position.y = justify.y;
 
         this.element.style.left = 100*((this.position.x)/Dot.screen) + "%";
         this.element.style.top = 100*((this.position.y)/Dot.screen) + "%";
@@ -242,7 +261,7 @@ class Collision {
             for(let j = i+1; j < this.dots.length; j++) {
                 const dot2 = this.dots[j];
 
-                this.wasd(dot1, dot2);
+                this.colisao(dot1, dot2);
             }
         }
         
@@ -252,7 +271,7 @@ class Collision {
                 if(dot1 == dot2)
                     return;
                 
-                this.wasd(dot1, dot2);
+                this.colisao(dot1, dot2);
             });
         });
         */
@@ -260,41 +279,39 @@ class Collision {
         this.lastUpdate = this.now;
     }
 
-    wasd(dot1, dot2) {
+    colisao(dot1, dot2) {
         const vetor = {
-            x: (dot1.position.x - dot2.position.x),
-            y: (dot1.position.y  - dot2.position.y)
+            x: dot1.position.x - dot2.position.x,
+            y: dot1.position.y - dot2.position.y
+        };
+    
+        const centerRadius = (dot1.rawSize + dot2.rawSize) / 2;
+        const totalWeight = dot1.weight + dot2.weight;
+        const distance = Math.sqrt(vetor.x * vetor.x + vetor.y * vetor.y);
+    
+        if (distance > centerRadius) {
+            return;
         }
-        const center_ = (dot1.rawSize + dot2.rawSize)/2;
-        const weight_ = (dot1.rawSize + dot2.rawSize);
-        let distance = Math.sqrt( (vetor.x * vetor.x) + (vetor.y * vetor.y) );
-
+    
+        if (distance < 0.0001)
+            return;
         
-        if (distance > center_)
-            return;
-
-        if (distance == 0) {
-            dot2.move_to(dot2.position.x - center_/2, dot2.position.y + center_/2);
-            dot1.move_to(dot1.position.x + center_/2, dot1.position.y - center_/2);
-            return;
-        }
-
+    
         dot1.is_colliding(true);
         dot2.is_colliding(true);
-        
-        const offset = (center_ - distance)*1.1;
-        const normalized = {x: vetor.x/distance, y: vetor.y/distance};
-        const move = {x: normalized.x * offset, y: normalized.y * offset};
-        
-        dot2.move(
-            -move.x * (dot1.weight/weight_),
-            -move.y * (dot1.weight/weight_)
-        );
-        dot1.move(
-            move.x * (dot2.weight/weight_),
-            move.y * (dot2.weight/weight_)
-        );
+    
+        //const overlap = (centerRadius - distance) * 1.1;
+        const overlap = (centerRadius - distance);
+        const normalized = { x: vetor.x / distance, y: vetor.y / distance };
+        const displacement = { x: normalized.x * overlap, y: normalized.y * overlap };
+    
+        const w2 = dot2.weight / totalWeight;
+        const w1 = dot1.weight / totalWeight;
+    
+        dot2.move(-displacement.x * w1, -displacement.y * w1);
+        dot1.move(displacement.x * w2, displacement.y * w2);
     }
+    
 }
 
 
@@ -330,9 +347,6 @@ document.addEventListener('mousedown', function(event) {
     var rectBox = box.getBoundingClientRect();
     if(rawMouse.x > rectBox.width || rawMouse.y > rectBox.height)
         return;
-
-    console.log(rawMouse);
-    console.log(rectBox);
 
     currentDot = new Dot(mousePos.x, mousePos.y, 13.4);
     currentDot.move_to(mousePos.x, mousePos.y);
