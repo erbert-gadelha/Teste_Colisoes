@@ -52,6 +52,9 @@ class Dot {
             this.element.style.width = this.size + "%";
         }
 
+        const pos_ = this.justify(this.position.x, this.position.y);
+        this.move_to(pos_.x, pos_.y);
+
         this.weight = Math.pow(this.size/2, 2);
     }
 
@@ -230,29 +233,33 @@ class Collision {
         if(this.effect != null)
             this.effect();
 
-        this.dots.forEach(dot => {
-            dot.is_colliding(false);
-        });
-        
-        for(let i = 0; i < this.dots.length; i++) {
-            const dot1 = this.dots[i];
-            for(let j = i+1; j < this.dots.length; j++) {
-                const dot2 = this.dots[j];
 
-                this.colisao(dot1, dot2);
-            }
-        }
-        
-        /*
-        this.dots.forEach(dot1 => {
-            this.dots.forEach(dot2 => {
-                if(dot1 == dot2)
-                    return;
-                
-                this.colisao(dot1, dot2);
+        for(let i = 0; i < 3; i++) {
+            
+            this.dots.forEach(dot => {
+                dot.is_colliding(false);
             });
-        });
-        */
+
+            for(let i = 0; i < this.dots.length; i++) {
+                const dot1 = this.dots[i];
+                for(let j = i+1; j < this.dots.length; j++) {
+                    const dot2 = this.dots[j];
+
+                    this.colisao(dot1, dot2);
+                }
+            }
+            
+            /*
+            this.dots.forEach(dot1 => {
+                this.dots.forEach(dot2 => {
+                    if(dot1 == dot2)
+                        return;
+                    
+                    this.colisao(dot1, dot2);
+                });
+            });
+            */
+        }
         this.count ++;
         this.lastUpdate = this.now;
     }

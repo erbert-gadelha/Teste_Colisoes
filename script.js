@@ -53,6 +53,8 @@ class Dot {
             this.element.style.width = this.size + "%";
         }
 
+        this.move_to(this.position.x, this.position.y);
+
         this.weight = Math.pow(this.size/2, 2);
     }
 
@@ -112,10 +114,9 @@ class Dot {
         this.velocity.x = (this.position.x - this.lastPos.x)*inertia;
         this.velocity.y = (this.position.y - this.lastPos.y)*inertia;
 
-        if(this.position.y > Dot.ground){
-            this.velocity.x *= Dot.friction;
-            this.velocity.y = 0;
-        }
+
+        /*if(this.position.y > Dot.ground)
+            this.velocity.x *= Dot.friction;*/
 
         this.velocity.y += Dot.gravity * delta;
         this.lastPos = {x: this.position.x, y: this.position.y};
@@ -124,19 +125,6 @@ class Dot {
         this.move(0, 0);
     }
 
-    att(delta) {
-
-        if(this.position.y > Dot.ground){
-            this.velocity.x *= Dot.friction;
-            this.velocity.y = 0;
-        }
-
-        this.velocity.y += Dot.gravity * delta;
-        this.lastPos = {x: this.position.x, y: this.position.y};
-        this.position.y += this.velocity.y;
-        this.position.x += this.velocity.x;
-        this.move(0, 0);
-    }
 
     is_colliding(is_colliding) {
         if(is_colliding == this.colliding)
@@ -232,67 +220,66 @@ class Collision {
         if(this.effect != null)
             this.effect();
 
-        this.dots.forEach(dot => {
-            dot.is_colliding(false);
-        });
-        
-        for(let i = 0; i < this.dots.length; i++) {
-            const dot1 = this.dots[i];
-            for(let j = i+1; j < this.dots.length; j++) {
-                const dot2 = this.dots[j];
-
-                this.wasd(dot1, dot2);
-            }
-        }
-        
-        /*
-        this.dots.forEach(dot1 => {
-            this.dots.forEach(dot2 => {
-                if(dot1 == dot2)
-                    return;
-                
-                this.wasd(dot1, dot2);
+        for(let i = 0; i < 3; i++) {
+            this.dots.forEach(dot => {
+                dot.is_colliding(false);
             });
-        });
-        */
+            
+            for(let i = 0; i < this.dots.length; i++) {
+                const dot1 = this.dots[i];
+                for(let j = i+1; j < this.dots.length; j++) {
+                    const dot2 = this.dots[j];
+
+                    this.colisao(dot1, dot2);
+                }
+            }
+            
+            /*
+            this.dots.forEach(dot1 => {
+                this.dots.forEach(dot2 => {
+                    if(dot1 == dot2)
+                        return;
+                    
+                    this.wasd(dot1, dot2);
+                });
+            });
+            */
+        }
         this.count ++;
         this.lastUpdate = this.now;
     }
 
-    wasd(dot1, dot2) {
+    colisao(dot1, dot2) {
         const vetor = {
-            x: (dot1.position.x - dot2.position.x),
-            y: (dot1.position.y  - dot2.position.y)
+            x: dot1.position.x - dot2.position.x,
+            y: dot1.position.y - dot2.position.y
+        };
+    
+        const centerRadius = (dot1.rawSize + dot2.rawSize) / 2;
+        const totalWeight = dot1.weight + dot2.weight;
+        const distance = Math.sqrt(vetor.x * vetor.x + vetor.y * vetor.y);
+    
+        if (distance > centerRadius) {
+            return;
         }
-        const center_ = (dot1.rawSize + dot2.rawSize)/2;
-        const weight_ = (dot1.rawSize + dot2.rawSize);
-        let distance = Math.sqrt( (vetor.x * vetor.x) + (vetor.y * vetor.y) );
-
+    
+        if (distance < 0.0001)
+            return;
         
-        if (distance > center_)
-            return;
-
-        if (distance == 0) {
-            dot2.move_to(dot2.position.x - center_/2, dot2.position.y + center_/2);
-            dot1.move_to(dot1.position.x + center_/2, dot1.position.y - center_/2);
-            return;
-        }
-
+    
         dot1.is_colliding(true);
         dot2.is_colliding(true);
-        
-        const offset = (center_ - distance)*1.1;
-        const normalized = {x: vetor.x/distance, y: vetor.y/distance};
-        const move = {x: normalized.x * offset, y: normalized.y * offset};
-        
-        dot2.move(
-            -move.x * (dot1.weight/weight_),
-            -move.y * (dot1.weight/weight_)
-        );
-        dot1.move(
-            move.x * (dot2.weight/weight_),
-            move.y * (dot2.weight/weight_)
-        );
+    
+        //const overlap = (centerRadius - distance) * 1.1;
+        const overlap = (centerRadius - distance);
+        const normalized = { x: vetor.x / distance, y: vetor.y / distance };
+        const displacement = { x: normalized.x * overlap, y: normalized.y * overlap };
+    
+        const w2 = dot2.weight / totalWeight;
+        const w1 = dot1.weight / totalWeight;
+    
+        dot2.move(-displacement.x * w1, -displacement.y * w1);
+        dot1.move(displacement.x * w2, displacement.y * w2);
     }
 }
 
